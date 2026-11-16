@@ -10,6 +10,7 @@ use App\Http\Controllers\CastController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\PeranController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\KritikController;
 
 Route::get('/', [FilmController::class, 'movieHome'])->name('home');
 Route::get('/movies', [FilmController::class, 'movies'])->name('movies');
@@ -26,27 +27,27 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('login.logout');
 
 // Group Route yang butuh Login & Authorization (Gate)
 Route::middleware(['auth'])->group(function () {
-    
-    // Dashboard User (Khusus User Biasa)
-    Route::get('/dashboard/user', [DashboardController::class, 'user'])
-        ->name('dashboard.user')
-        ->middleware('can:user');
 
-    // Dashboard Admin & CRUD Manajemen (Khusus Admin)
-    Route::middleware(['can:admin'])->group(function () {
-        Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-        
-        // Resource Routes untuk CRUD (Film, Cast, Genre, Peran)
-        Route::resource('film', FilmController::class);
-        Route::resource('cast', CastController::class);
-        Route::resource('genre', GenreController::class);
-        Route::resource('peran', PeranController::class);
-
-        // List Data User
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    // Khusus User Biasa
+    Route::middleware(['can:user'])->group(function () {
+        Route::get('/dashboard/user', [DashboardController::class, 'user'])->name('dashboard.user');
+        Route::post('/komentar', [KritikController::class, 'store'])->name('komentar.store');
     });
 
-    // Profile Route (Bisa diakses user biasa untuk melihat & mengubah profil sendiri)
+    // Khusus Admin
+    Route::middleware(['can:admin'])->group(function () {
+        Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::resource('casts', CastController::class)->except('show');
+            Route::resource('films', FilmController::class)->except('show');
+            Route::resource('genres', GenreController::class)->except('show');
+            Route::resource('perans', PeranController::class)->except('show');
+            Route::get('users', [UserController::class, 'index'])->name('users.index');
+        });
+    });
+
+    // Profile (user biasa melihat & mengubah profil sendiri)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });

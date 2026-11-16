@@ -48,11 +48,11 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin Panel <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                   <li><a href="{{ route('dashboard.admin') }}">Dashboard Admin</a></li>
-                  <li><a href="{{ route('film.index') }}">Kelola Film</a></li>
-                  <li><a href="{{ route('genre.index') }}">Kelola Genre</a></li>
-                  <li><a href="{{ route('cast.index') }}">Kelola Cast</a></li>
-                  <li><a href="{{ route('peran.index') }}">Kelola Peran</a></li>
-                  <li><a href="{{ route('users.index') }}">List Data User</a></li>
+                  <li><a href="{{ route('admin.films.index') }}">Kelola Film</a></li>
+                  <li><a href="{{ route('admin.genres.index') }}">Kelola Genre</a></li>
+                  <li><a href="{{ route('admin.casts.index') }}">Kelola Cast</a></li>
+                  <li><a href="{{ route('admin.perans.index') }}">Kelola Peran</a></li>
+                  <li><a href="{{ route('admin.users.index') }}">List Data User</a></li>
                 </ul>
               </li>
             @endcan

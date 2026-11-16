@@ -118,13 +118,17 @@
             <a href="#">Comments</a>
             
             {{-- FORM KOMENTAR HANYA MUNCUL UNTUK USER BIASA (SLIDE 20) --}}
-            @can('user')
+                       @can('user')
               <div class="agile-info-wthree-box">
-                <form action="{{ route('komentar.store', $film->id) }}" method="POST">
+                <form action="{{ route('komentar.store') }}" method="POST">
                   @csrf
-                  <input type="text" name="name" placeholder="Name" required="">                       
-                  <input type="email" name="email" placeholder="Email" required="">
-                  <input type="text" name="phone" placeholder="Phone" required="">
+                  <input type="hidden" name="film_id" value="{{ $film->id }}">
+                  <select name="rating" required="">
+                    <option value="">Rating (1-10)</option>
+                    @for ($i = 1; $i <= 10; $i++)
+                      <option value="{{ $i }}">{{ $i }}</option>
+                    @endfor
+                  </select>
                   <textarea name="comment" placeholder="Message" required=""></textarea>
                   <input type="submit" value="SEND">
                   <div class="clearfix"> </div>
@@ -136,7 +140,7 @@
           <div class="media-grids">
             @foreach ($comments as $comment)
               <div class="media">
-                <h5>{{ $comment->user_id }}</h5>
+                <h5>{{ $comment->user_name }}</h5>
                 <div class="media-left">
                   <a href="#">
                     <img src="{{ asset('storage/images/user.jpg') }}" title="One movies" alt=" " />

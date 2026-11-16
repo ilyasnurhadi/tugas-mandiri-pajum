@@ -20,7 +20,7 @@ class ProfileController extends Controller
             'email'   => 'required|email|max:255',
             'umur'    => 'required|integer',
             'bio'     => 'nullable|string',
-            'alamat'  => 'required|string', // Ubah dari address ke alamat
+            'alamat'  => 'required|string',
         ]);
 
         $user = Auth::user();
@@ -31,15 +31,19 @@ class ProfileController extends Controller
             'email' => $request->email,
         ]);
 
-        // Update atau buat tabel profiles
-        $user->profile()->updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'umur'   => $request->umur,
-                'bio'    => $request->bio,
-                'alamat' => $request->alamat, // Ubah dari address ke alamat
-            ]
-        );
+        // Update profil lewat relasi users.profile_id (buat baru bila belum ada)
+        $data = [
+            'umur'   => $request->umur,
+            'bio'    => $request->bio ?? '',
+            'alamat' => $request->alamat,
+        ];
+
+        if ($user->profile) {
+            $user->profile->update($data);
+        } else {
+            $profile = \App\Models\Profile::create($data);
+            $user->update(['profile_id' => $profile->id]);
+        }
 
         return redirect()->route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
     }

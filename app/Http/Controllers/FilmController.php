@@ -8,13 +8,17 @@ use App\Models\{
     Kritik,
     Peran,
 };
+use App\Http\Requests\StoreFilmRequest;
+use App\Http\Requests\UpdateFilmRequest;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class FilmController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    /* =====================================================
+     |  BAGIAN PUBLIK (halaman utama) - TIDAK DIUBAH
+     ===================================================== */
+
     public function movies()
     {
         //
@@ -28,9 +32,6 @@ class FilmController extends Controller
         return view('components/movies', compact('films', 'genreFilm'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Film $film)
     {
         //
@@ -92,5 +93,89 @@ class FilmController extends Controller
                 ->OrderBy('created_at', 'asc')
                 ->paginate(18);
         return view('components/movies', compact('films','genreFilm'));
+    }
+
+    /* =====================================================
+     |  BAGIAN ADMIN (CRUD) - BARU
+     ===================================================== */
+
+    public function index()
+    {
+        $films = Film::join('genres', 'films.genre_id', '=', 'genres.id')
+            ->select('films.*', 'genres.name as genre_name')
+            ->orderByDesc('films.id')
+            ->paginate(10);
+
+        return view('admin.films.index', compact('films'));
+    }
+
+    public function create()
+    {
+        return view('admin.films.form', [
+            'film'   => new Film(),
+            'genres' => Genre::orderBy('name')->get(),
+        ]);
+    }
+
+    public function store(StoreFilmRequest $request)
+    {
+        $data = $request->validated();
+        $data['poster'] = $this->storePoster($request->file('poster'));
+
+        Film::create($data);
+
+        return redirect()->route('admin.films.index');
+    }
+
+    public function edit(Film $film)
+    {
+        return view('admin.films.form', [
+            'film'   => $film,
+            'genres' => Genre::orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(UpdateFilmRequest $request, Film $film)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('poster')) {
+            $this->deletePoster($film->poster);
+            $data['poster'] = $this->storePoster($request->file('poster'));
+        } else {
+            unset($data['poster']);
+        }
+
+        $film->update($data);
+
+        return redirect()->route('admin.films.index');
+    }
+
+    public function destroy(Film $film)
+    {
+        // peran dan kritik film ini dihapus dulu (kunci asing tidak cascade)
+        Peran::where('film_id', $film->id)->delete();
+        Kritik::where('film_id', $film->id)->delete();
+
+        $this->deletePoster($film->poster);
+        $film->delete();
+
+        return redirect()->route('admin.films.index');
+    }
+
+    /* ---------- fungsi bantu poster ---------- */
+
+    private function storePoster($file): string
+    {
+        // disimpan di storage/app/public/posters, diakses lewat /storage/posters/...
+        return 'storage/' . $file->store('posters', 'public');
+    }
+
+    private function deletePoster(?string $poster): void
+    {
+        // hanya hapus file yang dibuat lewat form ini, poster bawaan seeder dibiarkan
+        if ($poster && str_starts_with($poster, 'storage/posters/')) {
+            Storage::disk('public')->delete(substr($poster, strlen('storage/')));
+        }
     }
 }

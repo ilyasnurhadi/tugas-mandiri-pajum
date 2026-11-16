@@ -10,7 +10,6 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    // HAPUS baris: use HasRoles; (karena bikin error trait tidak ditemukan)
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
@@ -39,10 +38,9 @@ class User extends Authenticatable
         return $this->belongsTo(Profile::class);
     }
 
-    // TAMBAHKAN FUNGSI INI di sini supaya method hasRole() di header.blade.php bisa jalan:
+    // Dipakai oleh header.blade.php
     public function hasRole($roleName)
     {
-        // Mengecek apakah user punya relasi role dan namanya sama dengan yang diminta
-        return $this->role && $this->role->name === $roleName;
+        return $this->role && $this->role->nama === $roleName;
     }
 }

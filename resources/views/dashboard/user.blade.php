@@ -34,6 +34,22 @@
                 </div>
             </div>
         </div>
+
+        <hr style="border-top: 1px solid #eee; margin: 10px 0 30px;">
+        <h3 style="font-weight: bold; color: #222; margin-bottom: 20px;">Daftar Film</h3>
+        <div class="row">
+            @forelse ($films as $film)
+                <div class="col-md-2 col-sm-3 col-xs-6" style="margin-bottom: 20px; text-align: center;">
+                    <a href="{{ route('movies.show', $film->id) }}">
+                        <img src="/{{ $film->poster }}" alt="{{ $film->title }}" style="width: 100%; height: 220px; object-fit: cover; border-radius: 4px;">
+                    </a>
+                    <p style="margin-top: 8px; font-weight: bold; color: #333; font-size: 13px;">{{ $film->title }}</p>
+                    <small class="text-muted">{{ $film->year }}</small>
+                </div>
+            @empty
+                <div class="col-md-12"><p class="text-muted">Belum ada film.</p></div>
+            @endforelse
+        </div>
     </div>
 </div>
 @endsection
