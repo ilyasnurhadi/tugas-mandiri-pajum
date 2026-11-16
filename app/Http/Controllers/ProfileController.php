@@ -2,65 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
-use App\Http\Requests\StoreProfileRequest;
-use App\Http\Requests\UpdateProfileRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function edit()
     {
-        //
+        $user = Auth::user()->load('profile');
+        return view('profile.edit', compact('user'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function update(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'name'    => 'required|string|max:255',
+            'email'   => 'required|email|max:255',
+            'umur'    => 'required|integer',
+            'bio'     => 'nullable|string',
+            'alamat'  => 'required|string', // Ubah dari address ke alamat
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreProfileRequest $request)
-    {
-        //
-    }
+        $user = Auth::user();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Profile $profile)
-    {
-        //
-    }
+        // Update tabel users
+        $user->update([
+            'name'  => $request->name,
+            'email' => $request->email,
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Profile $profile)
-    {
-        //
-    }
+        // Update atau buat tabel profiles
+        $user->profile()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'umur'   => $request->umur,
+                'bio'    => $request->bio,
+                'alamat' => $request->alamat, // Ubah dari address ke alamat
+            ]
+        );
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateProfileRequest $request, Profile $profile)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Profile $profile)
-    {
-        //
+        return redirect()->route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
     }
 }

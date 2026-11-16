@@ -8,8 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class Film extends Model
 {
     use HasFactory;
-    protected $table = 'films';
-    protected $fillable = ['title','sinopsis','year','poster','genre_id'];
 
-    
+    protected $table = 'films';
+    protected $fillable = [
+        'title',
+        'sinopsis',
+        'year',
+        'poster',
+        'genre_id',
+    ];
+
+    /**
+     * Relasi ke model Genre (Setiap film memiliki satu genre)
+     */
+    public function genre()
+    {
+        return $this->belongsTo(Genre::class, 'genre_id');
+    }
 }

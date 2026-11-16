@@ -6,7 +6,6 @@
 @endpush
 
 @push('scripts')
-
 <script type="text/javascript" src="{{ asset('template/list-js/jquery.basictable.min.js') }}"></script>
  <script type="text/javascript">
     $(document).ready(function() {
@@ -31,8 +30,8 @@
       </ol>
     </div>
     <div class="single-page-agile-info">
-                 <!-- /movie-browse-agile -->
-                         <div class="show-top-grids-w3lagile">
+               <!-- /movie-browse-agile -->
+                       <div class="show-top-grids-w3lagile">
       <div class="col-sm-8 single-left">
         <div class="song">
           <div class="single-right-grids">
@@ -42,7 +41,7 @@
             </div>
             <div class="col-md-8 single-right-grid-right">
               <div class="song-info">
-                <h2>{{ $film->title }}</h2>	
+                <h2>{{ $film->title }}</h2> 
                 <p class="author"><a href="#" class="author">{{ $film->year }}</a></p>
                 <p class="views">{{ $film->sinopsis }}</p>
               </div>
@@ -117,16 +116,22 @@
         <div class="all-comments">
           <div class="all-comments-info">
             <a href="#">Comments</a>
-            <div class="agile-info-wthree-box">
-              <form>
-                <input type="text" placeholder="Name" required="">			           					   
-                <input type="text" placeholder="Email" required="">
-                <input type="text" placeholder="Phone" required="">
-                <textarea placeholder="Message" required=""></textarea>
-                <input type="submit" value="SEND">
-                <div class="clearfix"> </div>
-              </form>
-            </div>
+            
+            {{-- FORM KOMENTAR HANYA MUNCUL UNTUK USER BIASA (SLIDE 20) --}}
+            @can('user')
+              <div class="agile-info-wthree-box">
+                <form action="{{ route('komentar.store', $film->id) }}" method="POST">
+                  @csrf
+                  <input type="text" name="name" placeholder="Name" required="">                       
+                  <input type="email" name="email" placeholder="Email" required="">
+                  <input type="text" name="phone" placeholder="Phone" required="">
+                  <textarea name="comment" placeholder="Message" required=""></textarea>
+                  <input type="submit" value="SEND">
+                  <div class="clearfix"> </div>
+                </form>
+              </div>
+            @endcan
+
           </div>
           <div class="media-grids">
             @foreach ($comments as $comment)
@@ -177,7 +182,7 @@
               </a>
               <div class="mid-1 agileits_w3layouts_mid_1_home">
                 <div class="w3l-movie-text">
-                  <h6><a href="{{ route('movies.show', $filmRelease->id) }}">{{ $filmRelease->title }}</a></h6>							
+                  <h6><a href="{{ route('movies.show', $filmRelease->id) }}">{{ $filmRelease->title }}</a></h6>            
                 </div>
                 <div class="mid-2 agile_mid_2_home">
                   <p>{{ $filmRelease->year }}</p>
@@ -204,19 +209,17 @@
       </div>
     </div>
   <!--body wrapper end-->
-          
-             
       </div>
       <!-- //w3l-latest-movies-grids -->
-    </div>	
+    </div>  
   </div>
 @endsection
 
 @push('scripts')
 <script src="js/simplePlayer.js"></script>
 <script>
-	$("document").ready(function() {
-		$("#video").simplePlayer();
-	});
+  $("document").ready(function() {
+    $("#video").simplePlayer();
+  });
 </script>
 @endpush

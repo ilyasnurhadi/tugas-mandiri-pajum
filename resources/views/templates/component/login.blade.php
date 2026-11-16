@@ -14,21 +14,23 @@
               </div>
               <div class="form">
               <h3>Login to your account</h3>
-              <form action="#" method="post">
-                <input type="text" name="Username" placeholder="Username" required="">
-                <input type="password" name="Password" placeholder="Password" required="">
-                <input type="submit" value="Login">
-              </form>
+             <form action="{{ route('login.authenticate') }}" method="post">
+              @csrf
+              <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required>
+              <input type="password" name="password" placeholder="Password" required>
+              <input type="submit" value="Login">
+             </form>
               </div>
               <div class="form">
               <h3>Create an account</h3>
-              <form action="#" method="post">
-                <input type="text" name="Username" placeholder="Username" required="">
-                <input type="password" name="Password" placeholder="Password" required="">
-                <input type="email" name="Email" placeholder="Email Address" required="">
-                <input type="text" name="Phone" placeholder="Phone Number" required="">
+              <form action="{{ route('register.store') }}" method="post">
+                @csrf
+                <input type="text" name="name" placeholder="Nama" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <input type="password" name="password_confirmation" placeholder="Ulangi Password" required>
                 <input type="submit" value="Register">
-              </form>
+            </form>
               </div>
               <div class="cta"><a href="#">Forgot your password?</a></div>
             </div>
